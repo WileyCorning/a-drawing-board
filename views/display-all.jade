@@ -1,0 +1,90 @@
+doctype html
+html
+  head
+    title All top-level posts
+    style.
+      html, body { margin: 0; padding:0; }
+      #messages { display: table; width: 100%;}
+      #messages > div { background-color: #eee;}
+      .line { margin: 10px; padding: 5px; border: 1px solid #aaa; vertical-align:middle; width: auto;}
+      .author { display: table-cell; min-width: 80px; text-align:right; padding-right: 20px;}
+      .content { display: table-cell; width: 100%;}
+      .reply-select {display: table-cell; color: #fff; background-color: #fa4; padding: 2px; border-radius:4px; cursor: pointer;}
+      #user-info {margin: 10px; padding: 10px; background-color: #ddf; border-radius: 8px;}
+      .username {font-size: 120%; font-weight: 600;}
+      #input-container {background-color: #dfd;}
+    script(src="/socket.io/socket.io.js")
+    script(src="http://code.jquery.com/jquery-1.11.1.js")
+    script.
+      var socket = io();
+      var add_message = function(msg) {
+        console.log(msg);
+        var line = $('<div class=line id=m'+msg['post_id']+'>');
+        var btn = $('<div class=reply-select>').text('Reply');
+        btn.click(function(event){});
+        line.append(
+          $('<div class=author>').text(msg['author']),
+          $('<div class=content>').text(msg['content']),
+          btn
+        )
+        if(msg['parent_id']){$('#m'+msg['parent_id']).append(line);}
+        else{$('#messages').prepend(line);}
+      }
+      
+      socket.on('message', function(msg){
+        add_message(msg);
+      });
+      
+      prefill = !{JSON.stringify(prefill)};
+      
+      $(document).ready(function(){
+        for(var i = 0; i < prefill.length; i++){
+          add_message(prefill[i]);
+        }
+      });
+  body
+    div(id='user-info')
+      if user_id
+        div(class='username') #{username}
+        button(id='logout-submit') Logout
+        script.
+          var cookie_parsed = document.cookie.split(';').map(function(s){return s.trim().split('=');}).reduce(function(a,b){a[b[0]]=b[1];return a;},{});
+          if(cookie_parsed['token']) {
+            socket.emit('authenticate',{'token': cookie_parsed['token']});
+          };
+          
+          $('#logout-submit').click(function(){
+            document.cookie = 'token=;expires=Thu, 01 Jan 1970 00:00:01 GMT;';
+            location.reload(true);
+          });
+              
+      else
+        div(id='login')
+          input(type='text',id='login-username',pattern='[A-Za-z0-9]+')
+          input(type='password',id='login-password')
+          button(id='login-submit') Login
+          script.
+            $('#login-submit').click(function(){
+              socket.emit('login', {
+                username: $('#login-username').val(),
+                password: $('#login-password').val()
+              });
+            });
+            socket.on('jwt', function(msg) {
+              console.log(msg);
+              document.cookie='token='+msg['token']+';';
+              location.reload(true);
+            });
+    if user_id
+      div(id='input-container', class='line')
+        div #{username}
+        input(type='text',id='input-content')
+        button(id='input-submit') Post
+        script.
+          $('#input-submit').click(function(){
+            socket.emit('create_post', {
+              content:$('#input-content').val()
+            });
+            $('#input-content').val('');
+          });
+    div(id='messages')
