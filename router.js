@@ -39,11 +39,20 @@ module.exports = function(dbqm) {
     }
   });
 
-  router.get('/', function(req, res){
-  //var q = 'SELECT user.name AS author, post.content AS content FROM user INNER JOIN post ON user.pk_user = post.fk_user_author;';
-    dbqm.get_all_posts([],function(rows) {
-      console.log('UID',res.locals.user_id);
-      res.render('display-all.jade',{prefill:rows});
+  router.get('/:pid([0-9]*)?', function(req, res){
+    var pid = req.params['pid'] || undefined;
+
+    // Callback hell - TODO fix
+    dbqm.get_replies_to([pid],function(rows_get_replies_to) {
+      if(pid) {
+        dbqm.get_post([pid],function(rows_get_post){
+          var parent = rows_get_post[0]
+          res.render('display-all.jade',{parent:rows_get_post[0],replies:rows_get_replies_to});
+        });
+      }
+      else {
+        res.render('display-all.jade',{replies:rows_get_replies_to});
+      }
     });
   });
 

@@ -4,42 +4,84 @@ html
     title All top-level posts
     style.
       html, body { margin: 0; padding:0; }
-      #messages { display: table; width: 100%;}
-      #messages > div { background-color: #eee;}
-      .line { margin: 10px; padding: 5px; border: 1px solid #aaa; vertical-align:middle; width: auto;}
-      .author { display: table-cell; min-width: 80px; text-align:right; padding-right: 20px;}
-      .content { display: table-cell; width: 100%;}
-      .reply-select {display: table-cell; color: #fff; background-color: #fa4; padding: 2px; border-radius:4px; cursor: pointer;}
+      #messages { display:table; text-align: center;  width: 100%;}
+      .reply-container {
+        width: 160px;
+        height: 160px;
+        display: inline-block;
+        position: relative;
+        overflow: hidden;
+        transition: opacity 1s ease;
+        margin-bottom: -4px;
+        box-shadow: 0 0 1px rgba(255,255,255,0.5);
+      }
+      .reply {
+        background-color: transparent;
+        margin: 8%;
+        display: block;
+        box-shadow: inset 0px 0px 4px rgba(0,0,0,0.5);
+        overflow: hidden;
+        border-radius: 10px;
+        vertical-align:middle;
+        transition: box-shadow 0.5s 1s ease, margin 0.5s 1.5s ease, border-radius 0.5s 1.5s ease;
+        position:absolute;
+        top:0;
+        bottom: 0;
+        left:0;
+        right:0;
+        text-decoration: none;
+        text-align: center;
+        vertical-align: middle;
+        color: black;
+        outline: 0;
+      }
+      .reply:hover{
+        transition: box-shadow 0.1s linear, margin 0.1s linear, border-radius 0.1s linear;
+        box-shadow: none;
+        margin: 0;
+        border-radius: 0;
+      }
+      .content {
+        display:inline;
+        margin: 0 auto;
+      }
       #user-info {margin: 10px; padding: 10px; background-color: #ddf; border-radius: 8px;}
       .username {font-size: 120%; font-weight: 600;}
       #input-container {background-color: #dfd;}
+      #post-parent {background-color: #fdd; margin: 20px; text-align:center;border-radius: 20px; padding: 10px;}
     script(src="/socket.io/socket.io.js")
     script(src="http://code.jquery.com/jquery-1.11.1.js")
     script.
-      var socket = io();
-      var add_message = function(msg) {
-        console.log(msg);
-        var line = $('<div class=line id=m'+msg['post_id']+'>');
-        var btn = $('<div class=reply-select>').text('Reply');
-        btn.click(function(event){});
-        line.append(
-          $('<div class=author>').text(msg['author']),
-          $('<div class=content>').text(msg['content']),
-          btn
-        )
-        if(msg['parent_id']){$('#m'+msg['parent_id']).append(line);}
-        else{$('#messages').prepend(line);}
+      var socket_room = #{(parent?'\'/'+parent.post_id+'\'':'\'/\'')};
+      var socket = io('',{query:'room='+socket_room});
+      
+      var make_reply = function(msg) {
+        var reply = $('<a class=reply id=m'+msg['post_id']+' href='+msg['post_id']+'>');
+        var reply_container = $('<div class=reply-container>')
+        reply_container.css('background-color','rgba(255,127,0,'+Math.random()+')');
+        reply.append(
+          $('<div class=content>').text(msg['content'])
+        );
+        reply_container.append(reply);
+        return reply_container;
+      }
+      
+      var add_reply = function(msg,fade=false) {
+        var elem = make_reply(msg)
+        if(fade){elem.css('opacity',0);}
+        $('#messages').prepend(elem);
+        if(fade){elem.fadeTo(1,1)};
       }
       
       socket.on('message', function(msg){
-        add_message(msg);
+        add_reply(msg,true);
       });
       
-      prefill = !{JSON.stringify(prefill)};
+      var replies = !{JSON.stringify(replies)};
       
       $(document).ready(function(){
-        for(var i = 0; i < prefill.length; i++){
-          add_message(prefill[i]);
+        for(var i = 0; i < replies.length; i++){
+          add_reply(replies[i]);
         }
       });
   body
@@ -80,11 +122,30 @@ html
         div #{username}
         input(type='text',id='input-content')
         button(id='input-submit') Post
-        script.
-          $('#input-submit').click(function(){
-            socket.emit('create_post', {
-              content:$('#input-content').val()
+        if parent
+          script.
+            $('#input-submit').click(function(){
+              socket.emit('create_post', {
+                content:$('#input-content').val(),
+                parent_id:#{parent.post_id}
+              });
+              $('#input-content').val('');
             });
-            $('#input-content').val('');
-          });
+        else
+          script.
+            $('#input-submit').click(function(){
+              socket.emit('create_post', {
+                content:$('#input-content').val()
+              });
+              $('#input-content').val('');
+            });
+          
+    if parent
+      div(id='post-parent')
+        if parent.parent_id
+          a(href='/'+parent.parent_id) View parent
+        else
+          a(href='/') Back to root
+        h1 #{parent.author}
+        div #{parent.content}
     div(id='messages')

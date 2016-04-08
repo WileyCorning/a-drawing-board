@@ -8,7 +8,7 @@ var DEFAULT_PROC_NAMES = [
   'login',
   'get_user_access',
   'get_post',
-  'get_all_posts'
+  'get_replies_to'
 ];
 
 module.exports = function(database_connection,proc_names) {

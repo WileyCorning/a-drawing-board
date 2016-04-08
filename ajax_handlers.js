@@ -17,7 +17,6 @@ module.exports = function(io,socket,dbqm) {
         dbqm.get_user_access([private_state['user_id']],function(rows){
           var flattened = rows.reduce(function(a,b){return a.concat(b['level']);});
           private_state['user_access'] = flattened;
-          console.log(private_state);
         });
         return;
       }
@@ -45,12 +44,11 @@ module.exports = function(io,socket,dbqm) {
 
   this.authenticate = function(msg) {
     try {
-      var token = msg['token']
+      var token = msg['token'];
       jwt.verify(token, JWT_KEY, function(err, decoded) {
         if(err) throw err;
         private_state['user_id'] = decoded['user_id'];
         private_state['username'] = decoded['username'];
-        console.log("Authenticated user",private_state['user_id']);
         update_user_access();
       });
     }
@@ -71,10 +69,9 @@ module.exports = function(io,socket,dbqm) {
   }
 
   this.create_post = function(msg){
-    console.log(msg);
     try {
-      dbqm.create_post([private_state['user_id'],msg['content'],undefined],function(rows){
-        io.emit('message',rows[0]);
+      dbqm.create_post([private_state['user_id'],msg['content'],msg['parent_id']],function(rows){
+        io.sockets.in(socket.room).emit('message',rows[0]);
       });
     }
     catch(err) {
@@ -82,7 +79,5 @@ module.exports = function(io,socket,dbqm) {
     }
   };
 
-  this.disconnect = function(){
-  	console.log('Somebody disconnected');
-  };
+  this.disconnect = function(){};
 };

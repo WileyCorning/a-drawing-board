@@ -29,14 +29,15 @@ var dbqm = new database_query_manager(dbc);
 app.use(router(dbqm));
 
 io.on('connection', function(socket) {
+  socket.room=socket.handshake.query.room;
+  socket.join(socket.room);
   var handlers = new ajax_handlers(io,socket,dbqm);
   Object.keys(handlers).forEach(function(event_type){
     socket.on(event_type,function(msg){console.log(event_type,msg);handlers[event_type](msg);});
   });
-  console.log("Somebody connected");
 });
 
-
-http.listen(3000, function(){
-  console.log('listening on *:3000');
+var port_number = 8080
+http.listen(port_number, function(){
+  console.log('Began listening on port '+port_number);
 });
