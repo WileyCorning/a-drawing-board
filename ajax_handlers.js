@@ -4,6 +4,7 @@
 */
 
 var jwt = require('jsonwebtoken');
+var fs = require('fs');
 
 var JWT_KEY = 'unsecure key';
 
@@ -70,8 +71,16 @@ module.exports = function(io,socket,dbqm) {
 
   this.create_post = function(msg){
     try {
-      dbqm.create_post([private_state['user_id'],msg['content'],msg['parent_id']],function(rows){
-        io.sockets.in(socket.room).emit('message',rows[0]);
+      dbqm.create_post([private_state['user_id'],msg['parent_id']],function(rows){
+        var content_addr = rows[0]['content'];
+
+        var imdata = msg['content'].replace(/^data:image\/png;base64,/, "");
+        var buf = new Buffer(imdata,'base64');
+
+        fs.writeFile('user_images/'+content_addr+'.png',buf,function(err){
+          if(err)console.log(err);
+          io.sockets.in(socket.room).emit('message',rows[0]);
+        });
       });
     }
     catch(err) {

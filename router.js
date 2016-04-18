@@ -47,11 +47,11 @@ module.exports = function(dbqm) {
       if(pid) {
         dbqm.get_post([pid],function(rows_get_post){
           var parent = rows_get_post[0]
-          res.render('display-all.jade',{parent:rows_get_post[0],replies:rows_get_replies_to});
+          res.render('display.jade',{parent:rows_get_post[0],replies:rows_get_replies_to});
         });
       }
       else {
-        res.render('display-all.jade',{replies:rows_get_replies_to});
+        res.render('display.jade',{replies:rows_get_replies_to});
       }
     });
   });

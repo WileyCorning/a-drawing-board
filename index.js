@@ -1,8 +1,11 @@
 
 
-var app = require('express')();
+var express = require('express');
+var app = express();
 var cookieParser = require('cookie-parser');
 app.set('view engine', 'jade');
+app.use('/i',express.static('user_images'));
+app.use('/s',express.static('static'));
 app.use(cookieParser());
 
 var http = require('http').Server(app);

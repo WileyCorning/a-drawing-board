@@ -1,0 +1,186 @@
+<html>
+  <head>
+      <script src="http://code.jquery.com/jquery-1.11.1.js")></script>
+      <link href='https://fonts.googleapis.com/css?family=Open+Sans:400,300,600' rel='stylesheet' type='text/css'>
+      <style>
+        body {
+          font-family: 'Open Sans',sans-serif;
+          margin:0;
+          padding:0;
+          width: 100%;
+          position: relative;
+          -webkit-touch-callout: none; /* iOS Safari */
+          -webkit-user-select: none;   /* Chrome/Safari/Opera */
+          -khtml-user-select: none;    /* Konqueror */
+          -moz-user-select: none;      /* Firefox */
+          -ms-user-select: none;       /* IE/Edge */
+          user-select: none;
+        }
+        #input-canvas {
+          box-shadow: 0px 0px 20px 20px rgba(127,127,127,0.5);
+          position: absolute;
+          left: 0;
+          right: 0;
+          margin-left: auto;
+          margin-right: auto;
+          top: 0;
+          bottom: 0;
+          margin-top: auto;
+          margin-bottom: auto;
+          image-rendering: optimizeSpeed;             /* Older versions of FF          */
+          image-rendering: -moz-crisp-edges;          /* FF 6.0+                       */
+          image-rendering: -webkit-optimize-contrast; /* Safari                        */
+          image-rendering: -o-crisp-edges;            /* OS X & Windows Opera (12.02+) */
+          image-rendering: pixelated;                 /* Awesome future-browsers       */
+          -ms-interpolation-mode: nearest-neighbor;
+        }
+        #controls {
+          text-align: center;
+        }
+        #canvas-container {
+          width: 100%;
+          height: 100%;
+          vertical-align: bottom;
+        }
+        #controls-color {
+          transform: rotate(-90deg);
+          position: fixed;
+          left: -100;
+          top: 140;
+          display: inline-block;
+          background: rgba(127,127,127,0.5);
+          box-shadow: inset 0px 0px 10px black;
+          padding: 10px;
+        }
+        #controls-zoom {
+          background: rgba(127,127,127,0.5);
+          box-shadow: inset 0px 0px 10px black;
+          left: 0;
+          right: 0;
+          width: 160px;
+          margin-left: auto;
+          margin-right: auto;
+          position: fixed;
+          top: 20px;
+          display: inline-block;
+          padding: 10px;
+        }
+        #controls-zoom button {
+          width: 40px;
+        }
+        #controls-brush {
+          background: rgba(127,127,127,0.5);
+          box-shadow: inset 0px 0px 10px black;
+          position: fixed;
+          right: 5;
+          top: 200;
+          transform: rotate(-90deg);
+          padding: 10px;
+        }
+        #controls-brush-display {
+          display: inline-block;
+          width: 20px;
+          height: 20px;
+          transform: rotate(90deg);
+        }
+        #controls-brush input[type=number] {
+          width: 20px;
+          height: 20px;
+          transform: rotate(90deg);
+        }
+        #controls-color-sliders {
+          float:left;
+          list-style: none;
+          text-align:left;
+          padding:0;
+          margin: 0;
+          overflow:hidden;
+        }
+        #controls-color-sliders div {
+          display:inline-block;
+          text-align:left;
+          margin-left: 5px;
+          width: 32px;
+          height: 16px;
+          overflow: hidden;
+        }
+        #controls-color-sliders input {
+          text-align: right;
+        }
+        #controls-color-display {
+          float:right;
+          vetical-align: middle;
+        }
+        .red {background-color: #f00}
+        .green {background-color: #0f0}
+        .blue {background-color: #00f}
+
+        .intro-text {
+          display: inline-block;
+          width: 100%;
+          position: absolute;
+          bottom: 0;
+          text-align: center;
+          font-size: 28px;
+          color: #333;
+          line-height: 50px;
+          text-shadow: 0px 0px 10px white;
+        }
+      </style>
+  </head>
+  <body style="background-color:#aaa">
+    <div id="canvas-container">
+      <div class="intro-text">
+        Click to draw!
+        <br>
+        Right-click selects color.
+      <br>
+        Ctrl-z to undo, ctrl-y to redo.
+      </div>
+      <script>
+        $(document).ready(function(){
+          $('.intro-text').delay(2000).fadeOut(1000);
+        });
+      </script>
+      <canvas id="input-canvas" width="256" height="256">
+      </canvas>
+    </div>
+    <nav id="controls">
+      <div id="controls-zoom">
+        <button onclick="zoom_canvas(scale/2)">-</button>
+        <button onclick="zoom_canvas(1)">O</button>
+        <button onclick="zoom_canvas(scale*2)">+</button>
+      </div>
+      <div id="controls-brush">
+        <input id="controls-brush-slider" type="range" min="1" max="25" value="5" step="1"/>
+        <div id ="controls-brush-display">5</div>
+        <script>
+          (function(){
+            f = function(){$('#controls-brush-display').text($('#controls-brush-slider').val());}
+            $("#controls-brush-slider").on('input',f);
+            $(document).ready(f);
+          })();
+        </script>
+      </div>
+      <div id="controls-color">
+        <ul id="controls-color-sliders">
+          <li>
+            <div class='red'></div>
+            <input type="range" min="0" max="255" value="0" step="1" id="controls-color-red"></input>
+          </li>
+          <li>
+            <div class='green'></div>
+            <input type="range" min="0" max="255" value="0" step="1" id="controls-color-green"></input>
+          </li>
+          <li>
+            <div class='blue'></div>
+            <input type="range" min="0" max="255" value="0" step="1" id="controls-color-blue"></input>
+          </li>
+        </ul>
+        <canvas width=80 height=80 id="controls-color-display"></canvas>
+      </div>
+    </nav>
+    <script src="draw.js">
+    </script>
+  </body>
+</html>

@@ -1,0 +1,316 @@
+doctype html
+html
+  head
+    title All top-level posts
+    link(href='https://fonts.googleapis.com/css?family=Open+Sans:400,300,600',rel='stylesheet',type='text/css')
+    link(href='https://fonts.googleapis.com/css?family=Tangerine:700',rel='stylesheet',type='text/css')
+    style.
+      body {
+        font-family: 'Open Sans',sans-serif;
+        margin: 0;
+        padding:0;
+        background-image: url("s/bgstripe.jpg");
+      }
+      #message-container { display:table; text-align: center;  width: 100%;}
+      .reply-container {
+        width: 160px;
+        height: 160px;
+        display: inline-block;
+        position: relative;
+        overflow: hidden;
+        transition: opacity 1s ease;
+        margin-bottom: -5px;
+        box-shadow: 0 0 1px rgba(255,255,255,0.5);
+      }
+      .reply {
+        background-color: transparent;
+        margin: 14px;
+        display: block;
+        box-shadow: inset 0px 0px 4px rgba(0,0,0,0.5);
+        overflow: hidden;
+        border-radius: 10px;
+        vertical-align:middle;
+        transition: box-shadow 0.5s 1s ease, margin 0.5s 1.5s ease, border-radius 0.5s 1.5s ease;
+        position:absolute;
+        top:0;
+        bottom: 0;
+        left:0;
+        right:0;
+        text-decoration: none;
+        text-align: center;
+        vertical-align: middle;
+        color: black;
+        outline: 0;
+      }
+      .reply img {
+        width: 160px;
+        height: 160px;
+        margin-top: -14px;
+        margin-left: -14px;
+        transition: margin 0.5s 1.5s ease;
+      }
+      .reply:hover img {
+        transition: margin 0.1s linear;
+        margin: 0;
+      }
+      .reply:hover{
+        transition: box-shadow 0.1s linear, margin 0.1s linear, border-radius 0.1s linear;
+        box-shadow: none;
+        margin: 0;
+        border-radius: 0;
+      }
+      #header {
+        margin: 0;
+        padding: 10px 0px 10px 0;
+        border-bottom: 1px solid #aaa;
+        background-color: #eee; 
+        width: 100%;
+        z-index: 100;
+        text-align: center;
+      }
+      #header-left{
+        float:left;
+      }
+      #header-below{
+        padding-top: 10px;
+      }
+      #header-right{
+        float:right;
+      }
+      .username {font-size: 120%; font-weight: 600; float:left;}
+      .logo {
+        display: inline-block;
+        font-size: 64px;
+        line-height: 0px;
+        padding-top: 24px;
+        padding-bottom: 0px;
+        font-family: 'Tangerine',cursive;
+        font-weight: 700;
+      }
+      .header-buttons {
+        float: right;
+      }
+      #page-content{
+        margin-top:20px;
+      }
+      #input-overlay {
+        display: none;
+        position: fixed;
+        top: 0;
+        bottom: 0;
+        width: 100%;
+        height: 100%;
+        text-align: center;
+        z-index: 10;
+      }
+      #input-overlay-background {
+        width: 100%;
+        height: 100%;
+        position: fixed;
+        background-color: rgba(127,127,127,0.5);
+      }
+      #input-container {
+        vertical-align: middle;
+        display: inline-block;
+        padding: 20px;
+        border-radius: 20px;
+        background-color: white;
+        position: absolute;
+        left: 0;
+        right: 0;
+        margin-left: auto;
+        margin-right: auto;
+        top: 0;
+        bottom: 0;
+        margin-top: auto;
+        margin-bottom: auto;
+        height: 700px;
+        width:840px;
+      }
+      #post-parent {
+        background-color: #ddd;
+        margin: 20px;
+        padding: 20px;
+        text-align:center;
+        padding: 10px;
+      }
+      #post-parent-left{
+        display: inline-block;
+        float: left;
+      }
+      #post-parent-content {
+        display: inline-block;
+      }
+      #post-parent-right{
+        display: inline-block;
+        float: right;
+      }
+      .container{
+        max-width:1280px;
+        margin: auto;
+        padding: 0px 20px 0px 20px;
+      }
+      #input-open-container {
+        background-color: rgba(0,0,255,1.0);
+        box-shadow: inset 0px 0px 5px black;
+      }
+      #input-open-button {
+        box-shadow: 0px 0px 5px 0px black;
+        background-color: transparent;
+        margin: 15px;
+        display: block;
+        overflow: hidden;
+        border-radius: 80px;
+        transition: box-shadow 0.2s ease;
+        position:absolute;
+        top:0;
+        bottom: 0;
+        left:0;
+        right:0;
+        outline: 0;
+      }
+      #input-open-button:hover {
+        transition: box-shadow 0.2s ease;
+        box-shadow:
+        0px 0px 0px 2px rgba(0,0,255,1.0),
+          0px 0px 5px 5px white;
+      }
+      #input-open-button img {
+        width: 160px;
+        height: 160px;
+        margin-left: -15px;
+        margin-top: -15px;
+      }
+      #login input {
+        width: 160px;
+      }
+    script(src="/socket.io/socket.io.js")
+    script(src="http://code.jquery.com/jquery-1.11.1.js")
+    script.
+      var socket_room = #{(parent?'\'/'+parent.post_id+'\'':'\'/\'')};
+      var socket = io('',{query:'room='+socket_room});
+      
+      var make_reply = function(msg) {
+        var reply_container = $('<div class=reply-container>');
+        reply_container.css('background-color','rgba(255,127,0,'+Math.random()+')');
+        var reply = $('<a class=reply id=m'+msg['post_id']+' href='+msg['post_id']+'>');
+        reply.append(
+          $('<img class=content src=i/'+msg['content']+'.png>')
+        );
+        reply_container.append(reply);
+        return reply_container;
+      }
+      
+      var add_reply = function(msg,fade=false) {
+        var elem = make_reply(msg);
+        if(fade){elem.css('opacity',0);}
+        $('#messages').prepend(elem);
+        if(fade){elem.fadeTo(1,1)};
+      }
+      
+      socket.on('message', function(msg){
+        add_reply(msg,true);
+      });
+      
+      var replies = !{JSON.stringify(replies)};
+      
+      $(document).ready(function(){
+        for(var i = 0; i < replies.length; i++){
+          add_reply(replies[i]);
+        }
+      });
+  body
+    nav(id='header')
+      div(class='container')
+        span(class='logo') Site Name
+        if user_id
+          span(id='header-left')
+            span(class='username') #{username}
+          span(id='header-right')
+            button(id='logout-submit') Logout
+          script.
+            var cookie_parsed = document.cookie.split(';').map(function(s){return s.trim().split('=');}).reduce(function(a,b){a[b[0]]=b[1];return a;},{});
+            if(cookie_parsed['token']) {
+              socket.emit('authenticate',{'token': cookie_parsed['token']});
+            };
+            
+            $('#logout-submit').click(function(){
+              document.cookie = 'token=;expires=Thu, 01 Jan 1970 00:00:01 GMT;';
+              location.reload(true);
+            });
+                
+        else
+          div(id='login')
+            input(type='text',id='login-username', placeholder='username', pattern='[A-Za-z0-9]+')
+            input(type='password',id='login-password', placeholder='password')
+            button(id='login-submit') Login
+            button(id='login-submit-create') Sign up
+            script.
+              $('#login-submit').click(function(){
+                socket.emit('login', {
+                  username: $('#login-username').val(),
+                  password: $('#login-password').val()
+                });
+              });
+              socket.on('jwt', function(msg) {
+                console.log(msg);
+                document.cookie='token='+msg['token']+';';
+                location.reload(true);
+              });
+    if user_id
+      div(id='input-overlay')
+        div(id='input-overlay-background')
+        div(id='input-container')
+          div #{username}
+          iframe(width=800,height=600,id='input-frame',src="s/inputter.html")
+          div
+            button(id='input-submit') Post
+            button(id='input-cancel') Cancel
+        if parent
+          script.
+            $('#input-cancel').click(function(){$('#input-overlay').css('display','none');});
+            $('#input-submit').click(function(){
+              var payload = $('iframe').contents().find('#input-canvas')[0].toDataURL('image/png');
+              socket.emit('create_post', {
+                content:payload,
+                parent_id:#{parent.post_id}
+              });
+              $('iframe')[0].src+='';
+              $('#input-overlay').css('display','none');
+            });
+        else
+          script.
+            $('#input-cancel').click(function(){$('#input-overlay').css('display','none');});
+            $('#input-submit').click(function(){
+              var payload = $('iframe').contents().find('#input-canvas')[0].toDataURL('image/png');
+              socket.emit('create_post', {
+                content:payload
+              });
+              $('iframe')[0].src+='';
+              $('#input-overlay').css('display','none');
+            });
+    div(id='page-content' class='container')
+      if parent
+        div(id='post-parent')
+          div(id='post-parent-left')
+            if parent.parent_id
+              a(href='/'+parent.parent_id) View parent
+            else
+              a(href='/') Back to root
+          img(id='post-parent-content' src='i/'+parent.content+'.png')
+          div(id='post-parent-right') #{parent.author}
+      div(id='message-container')
+        if user_id
+          div(id='input-open-container',class='reply-container')
+            a(id='input-open-button',href='#')
+              img(src='s/reply-button.png')
+          script.
+            var hide_overlay = function(){$('#input-overlay').css('display','none');};
+            $('#input-open-container').click(function(){$('#input-overlay').css('display','block');});
+            $('#input-overlay-background').click(hide_overlay);
+            $(document).keydown(function(event){
+              if(event.which===27){
+                hide_overlay();
+              }
+            });
+        span(id='messages')
