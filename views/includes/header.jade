@@ -26,6 +26,11 @@ style.
     padding-bottom: 0px;
     font-family: 'Tangerine',cursive;
     font-weight: 700;
+    text-decoration: none;
+    color: black;
+  }
+  .logo:hover{
+    text-shadow: 0px 0px 8px black;
   }
   .header-buttons {
     float: right;
@@ -36,10 +41,10 @@ style.
 mixin header
   nav#header
     .container
-      span.logo Site Name
+      a.logo(href='/') Site Name
       if user_id
         span#header-left
-          span.username=username
+          a(href='/u/#{user_id}').username=username
         span#header-right
           button#logout-submit Logout
         script.
@@ -73,5 +78,11 @@ mixin header
                 console.log(msg);
                 document.cookie='token='+msg['token']+';';
                 location.reload(true);
+              });
+              $('#login-submit-create').click(function(){
+                socket.emit('create_user', {
+                  username: $('#login-username').val(),
+                  password: $('#login-password').val()
+                });
               });
             });

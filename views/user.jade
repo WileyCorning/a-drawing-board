@@ -1,0 +1,14 @@
+doctype html
+html
+  head
+    title Viewing #{user.user_id}
+    include includes/common.jade
+    include includes/client_socket.jade
+    +client_socket
+  body
+    include includes/header.jade
+    +header
+    #page-content.container
+      include includes/post_list.jade
+      include includes/post_detail.jade
+      +post_list({'author_id':user.user_id})

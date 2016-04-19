@@ -84,7 +84,7 @@ mixin post_list(selector,allow_replies)
     if(allow_replies)
       #input-open-container.post-container
         a#input-open-button(href='#')
-          img(src='s/reply-button.png')
+          img(src='/s/reply-button.png')
         script.
           $(document).ready(function(){
             var hide_overlay = function(){$('#input-overlay').css('display','none');};
@@ -97,8 +97,8 @@ mixin post_list(selector,allow_replies)
       $(document).ready(function(){
         var make_post = function(msg) {
           var post_container = $('<div class=post-container>');
-          var post = $('<a class=post id=m'+msg['post_id']+' href='+msg['post_id']+'>');
-          var image = $('<img class=content src=i/'+msg['content']+'.png>')
+          var post = $('<a class=post id=m'+msg['post_id']+' href=/'+msg['post_id']+'>');
+          var image = $('<img class=content src=/i/'+msg['content']+'.png>')
           post.append(image);
           post_container.append(post);
           post_container.css({
@@ -117,6 +117,7 @@ mixin post_list(selector,allow_replies)
         });
         
         socket.on('messages',function(msg){
+          WWW = msg;
           for(var i = 0; i < msg.length; i++){
             $('#postList').prepend(make_post(msg[i]));
           }

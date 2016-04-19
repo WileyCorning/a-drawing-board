@@ -26,4 +26,5 @@ mixin post_detail(post)
       else
         a(href='/') Back to root
     img.postDetail-content(src='i/'+post.content+'.png')
-    .postDetail-right=parent.author
+    .postDetail-right
+      a(href='/u/#{parent.author_id}')=parent.author

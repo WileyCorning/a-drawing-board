@@ -11,6 +11,7 @@ var JWT_KEY = 'unsecure key';
 module.exports = function(io,socket,dbqm) {
 
   var private_state = {user_access:['guest']};
+  var self = this;
 
   var update_user_access = function() {
     if(private_state['user_id']) {
@@ -62,6 +63,8 @@ module.exports = function(io,socket,dbqm) {
     try {
       var res_create_user = dbqm.create_user([msg['username'],msg['password']],function(rows) {
         socket.emit('user_created',{'user_id': rows[0]['user_id']});
+        // Dodgy
+        self.login(msg);
       });
     }
     catch(err) {

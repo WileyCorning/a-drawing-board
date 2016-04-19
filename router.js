@@ -44,12 +44,17 @@ module.exports = function(dbqm) {
   });
 
   router.get('/:pid([0-9]+)', function(req, res){
-    var pid = req.params['pid'] || undefined;
+    var pid = req.params['pid'];
     dbqm.get_post([pid],function(rows){
       var parent = rows[0]
       res.render('post_and_replies.jade',{parent:rows[0]});
     });
   });
+
+  router.get('/u/:uid([0-9]+)',function(req,res){
+    var uid = req.params['uid'];
+    res.render('user.jade',{user:{user_id: uid}});
+  })
 
   return router;
 };
