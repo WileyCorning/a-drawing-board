@@ -104,8 +104,6 @@ var interpolate = function(a,b) {
   }
 }
 
-console.log('aa')
-
 selected_brush = brushes[3];
 var refresh_selected_brush = function(){selected_brush = brushes[$('#controls-brush-slider').val()]}
 

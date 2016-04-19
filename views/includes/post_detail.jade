@@ -1,0 +1,29 @@
+style.
+  .postDetail {
+    background-color: #ddd;
+    margin: 20px;
+    padding: 20px;
+    text-align:center;
+    padding: 10px;
+  }
+  .postDetail-left{
+    display: inline-block;
+    float: left;
+  }
+  .postDetail-content {
+    display: inline-block;
+  }
+  .postDetail-right{
+    display: inline-block;
+    float: right;
+  }
+
+mixin post_detail(post)
+  .postDetail
+    .postDetail-left
+      if post.parent_id
+        a(href='/'+post.parent_id) View parent
+      else
+        a(href='/') Back to root
+    img.postDetail-content(src='i/'+post.content+'.png')
+    .postDetail-right=parent.author

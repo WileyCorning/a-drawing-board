@@ -1,0 +1,124 @@
+style.
+  #input-open-container {
+    background-color: rgba(0,0,255,1.0);
+    box-shadow: inset 0px 0px 5px black;
+  }
+  #input-open-button {
+    box-shadow: 0px 0px 5px 0px black;
+    background-color: transparent;
+    margin: 15px;
+    display: block;
+    overflow: hidden;
+    border-radius: 80px;
+    transition: box-shadow 0.2s ease;
+    position:absolute;
+    top:0;
+    bottom: 0;
+    left:0;
+    right:0;
+    outline: 0;
+  }
+  #input-open-button:hover {
+    transition: box-shadow 0.2s ease;
+    box-shadow:
+    0px 0px 0px 2px rgba(0,0,255,1.0),
+      0px 0px 5px 5px white;
+  }
+  #input-open-button img {
+    width: 160px;
+    height: 160px;
+    margin-left: -15px;
+    margin-top: -15px;
+  }
+  .post-container {
+    width: 160px;
+    height: 160px;
+    display: inline-block;
+    position: relative;
+    overflow: hidden;
+    transition: opacity 1s ease;
+    margin-bottom: -5px;
+    box-shadow: 0 0 1px rgba(255,255,255,0.5);
+  }
+  .post {
+    background-color: transparent;
+    margin: 14px;
+    display: block;
+    box-shadow: inset 0px 0px 4px rgba(0,0,0,0.5);
+    overflow: hidden;
+    border-radius: 10px;
+    vertical-align:middle;
+    transition: box-shadow 0.5s 1s ease, margin 0.5s 1.5s ease, border-radius 0.5s 1.5s ease;
+    position:absolute;
+    top:0;
+    bottom: 0;
+    left:0;
+    right:0;
+    text-decoration: none;
+    text-align: center;
+    vertical-align: middle;
+    color: black;
+    outline: 0;
+  }
+  .post img {
+    width: 160px;
+    height: 160px;
+    margin-top: -14px;
+    margin-left: -14px;
+    transition: margin 0.5s 1.5s ease;
+  }
+  .post:hover img {
+    transition: margin 0.1s linear;
+    margin: 0;
+  }
+  .post:hover{
+    transition: box-shadow 0.1s linear, margin 0.1s linear, border-radius 0.1s linear;
+    box-shadow: none;
+    margin: 0;
+    border-radius: 0;
+  }
+
+mixin post_list(selector,allow_replies)
+  -selector=selector||{}
+  .postList-container
+    if(allow_replies)
+      #input-open-container.post-container
+        a#input-open-button(href='#')
+          img(src='s/reply-button.png')
+        script.
+          $(document).ready(function(){
+            var hide_overlay = function(){$('#input-overlay').css('display','none');};
+            $('#input-open-container').click(function(){$('#input-overlay').css('display','block');});
+            $('#input-overlay-background').click(hide_overlay);
+            $(document).keydown(function(event){if(event.which===27) hide_overlay();});
+          });
+    span#postList
+    script.
+      $(document).ready(function(){
+        var make_post = function(msg) {
+          var post_container = $('<div class=post-container>');
+          var post = $('<a class=post id=m'+msg['post_id']+' href='+msg['post_id']+'>');
+          var image = $('<img class=content src=i/'+msg['content']+'.png>')
+          post.append(image);
+          post_container.append(post);
+          post_container.css({
+            'opacity':'0',
+            'background-color':'rgba(255,127,0,'+Math.random()+')'
+          });
+          image.one('load',function(){post_container.css('opacity',1)}).each(function(){if(this.complete) $(this).load();});
+          return post_container;
+        }
+        
+        socket.emit('get_posts_matching',!{JSON.stringify(selector)});
+        
+        // TODO check selector
+        socket.on('message', function(msg){
+          $('#postList').prepend(make_post(msg));
+        });
+        
+        socket.on('messages',function(msg){
+          for(var i = 0; i < msg.length; i++){
+            $('#postList').prepend(make_post(msg[i]));
+          }
+        });
+      });

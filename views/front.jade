@@ -1,0 +1,19 @@
+doctype html
+html
+  head
+    title Site Title
+    include includes/common.jade
+    include includes/client_socket.jade
+    +client_socket
+  body
+    include includes/header.jade
+    +header
+    if user_id
+      include includes/input_overlay.jade
+      +input_overlay
+    #page-content.container
+      include includes/post_list.jade
+      if user_id
+        +post_list({'parent_id':-1},true)
+      else
+        +post_list({'parent_id':-1})

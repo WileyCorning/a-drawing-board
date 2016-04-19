@@ -39,20 +39,15 @@ module.exports = function(dbqm) {
     }
   });
 
-  router.get('/:pid([0-9]*)?', function(req, res){
-    var pid = req.params['pid'] || undefined;
+  router.get('/',function(req,res){
+    res.render('front.jade');
+  });
 
-    // Callback hell - TODO fix
-    dbqm.get_replies_to([pid],function(rows_get_replies_to) {
-      if(pid) {
-        dbqm.get_post([pid],function(rows_get_post){
-          var parent = rows_get_post[0]
-          res.render('display.jade',{parent:rows_get_post[0],replies:rows_get_replies_to});
-        });
-      }
-      else {
-        res.render('display.jade',{replies:rows_get_replies_to});
-      }
+  router.get('/:pid([0-9]+)', function(req, res){
+    var pid = req.params['pid'] || undefined;
+    dbqm.get_post([pid],function(rows){
+      var parent = rows[0]
+      res.render('post_and_replies.jade',{parent:rows[0]});
     });
   });
 

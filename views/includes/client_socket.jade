@@ -1,0 +1,10 @@
+
+script(src="/socket.io/socket.io.js")
+mixin client_socket
+  script.
+    // Fire before document.ready
+    (function(){
+      var socket_room = #{(parent?'\'/'+parent.post_id+'\'':'\'/\'')};
+      socket = io('',{query:'room='+socket_room});  // Global
+    })();
+//TODO move add_reply js to the post_list template

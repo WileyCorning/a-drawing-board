@@ -1,0 +1,77 @@
+style.
+  #header {
+    margin: 0;
+    padding: 10px 0px 10px 0;
+    border-bottom: 1px solid #aaa;
+    background-color: #eee;
+    width: 100%;
+    z-index: 100;
+    text-align: center;
+  }
+  #header-left{
+    float:left;
+  }
+  #header-below{
+    padding-top: 10px;
+  }
+  #header-right{
+    float:right;
+  }
+  .username {font-size: 120%; font-weight: 600; float:left;}
+  .logo {
+    display: inline-block;
+    font-size: 64px;
+    line-height: 0px;
+    padding-top: 24px;
+    padding-bottom: 0px;
+    font-family: 'Tangerine',cursive;
+    font-weight: 700;
+  }
+  .header-buttons {
+    float: right;
+  }
+  #login input {
+    width: 160px;
+  }
+mixin header
+  nav#header
+    .container
+      span.logo Site Name
+      if user_id
+        span#header-left
+          span.username=username
+        span#header-right
+          button#logout-submit Logout
+        script.
+          $(document).ready(function(){
+            var cookie_parsed = document.cookie.split(';').map(function(s){return s.trim().split('=');}).reduce(function(a,b){a[b[0]]=b[1];return a;},{});
+            if(cookie_parsed['token']) {
+              socket.emit('authenticate',{'token': cookie_parsed['token']});
+            };
+            
+            $('#logout-submit').click(function(){
+              document.cookie = 'token=;expires=Thu, 01 Jan 1970 00:00:01 GMT;';
+              location.reload(true);
+            });
+          });
+              
+      else
+        div#login
+          input#login-username(type='text', placeholder='username', pattern='[A-Za-z0-9]+')
+          input#login-password(type='password', placeholder='password')
+          button#login-submit Login
+          button#login-submit-create Sign up
+          script.
+            $(document).ready(function(){
+              $('#login-submit').click(function(){
+                socket.emit('login', {
+                  username: $('#login-username').val(),
+                  password: $('#login-password').val()
+                });
+              });
+              socket.on('jwt', function(msg) {
+                console.log(msg);
+                document.cookie='token='+msg['token']+';';
+                location.reload(true);
+              });
+            });

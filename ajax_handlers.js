@@ -88,5 +88,16 @@ module.exports = function(io,socket,dbqm) {
     }
   };
 
+  this.get_posts_matching = function(msg) {
+    try {
+      dbqm.get_posts_matching([msg.parent_id,msg.author_id],function(rows) {
+        socket.emit('messages',rows);
+      });
+    }
+    catch(err) {
+      console.log(err);
+    }
+  }
+
   this.disconnect = function(){};
 };
