@@ -28,3 +28,5 @@ mixin post_detail(post)
     img.postDetail-content(src='i/'+post.content+'.png')
     .postDetail-right
       a(href='/u/#{parent.author_id}')=parent.author
+      div=parent.creation_time
+      div #{parent.num_replies} replies

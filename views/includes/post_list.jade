@@ -77,6 +77,19 @@ style.
     margin: 0;
     border-radius: 0;
   }
+  .reply-count{
+    display: inline-block;
+    position: absolute;
+    bottom: 0;
+    right: 0;
+    z-index: 5;
+    padding: 20px;
+    opacity: 0.5;
+    color: #444;
+    text-shadow: 0px 0px 2px #fff, 0px 0px 1px #fff;
+    font-weight: 600;
+    pointer-events: none;
+  }
 
 mixin post_list(selector,allow_replies)
   -selector=selector||{}
@@ -99,6 +112,8 @@ mixin post_list(selector,allow_replies)
           var post_container = $('<div class=post-container>');
           var post = $('<a class=post id=m'+msg['post_id']+' href=/'+msg['post_id']+'>');
           var image = $('<img class=content src=/i/'+msg['content']+'.png>')
+          var reply_count = $('<div class=reply-count>').html(msg['num_replies']);
+          post_container.append(reply_count);
           post.append(image);
           post_container.append(post);
           post_container.css({
