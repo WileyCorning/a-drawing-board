@@ -17,14 +17,27 @@ module.exports = function(dbqm) {
     if(token){
       try {
         jwt.verify(token, JWT_KEY, function(err, decoded) {
-          if(err) throw err;
-          dbqm.get_user_access([decoded['user_id']],function(rows){
-            res.locals.user_id = decoded['user_id'];
-            res.locals.username = decoded['username'];
-            var flattened = rows.map(function(r){return r['level'];});
-            res.locals.user_access = flattened;
+          if(err) {
+            console.log('JWT decode error:',err);
+            res.locals.user_access=['guest'];
             next();
-          });
+          }
+          else {
+            dbqm.get_user_access(
+              [decoded['user_id']],
+              function(rows){
+                res.locals.user_id = decoded['user_id'];
+                res.locals.username = decoded['username'];
+                var flattened = rows.map(function(r){return r['level'];});
+                res.locals.user_access = flattened;
+                next();
+              },
+              function(err){
+                console.log(err);
+                next();
+              }
+            );
+          }
         });
       }
       catch(err) {

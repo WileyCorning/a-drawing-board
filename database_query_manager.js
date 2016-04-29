@@ -11,22 +11,30 @@ var DEFAULT_PROC_NAMES = [
   'get_posts_matching'
 ];
 
+var ESE_PREF_LEN = 'ER_SIGNAL_EXCEPTION: '.length
+
 module.exports = function(database_connection,proc_names) {
 
   var call_procedure = function(proc_name) {
-    var f = function(query_par, callback) {
+    var f = function(query_par, callback_success, callback_failure) {
       var query_str ='call '+proc_name+'('+[...'?'.repeat(query_par.length)].join(',')+');';
-      var out;
       console.log(query_str,query_par);
       database_connection.query(query_str,query_par,function(err,results,fields) {
-        // Handle error
+        // Handle error thrown during procedure
         if(err) {
-          console.log('Issue has occurred in procedure call:');
-          console.log('\t',query_str,query_par);
-          console.log('\t',err);
+          if(err.sqlState=='45000'){
+            // Inform client of manually defined errors
+            callback_failure(err.message.slice(ESE_PREF_LEN));
+          }
+          else {
+            console.log('Unexpected issue in procedure call:');
+            console.log('\t',query_str,query_par);
+            console.log('\t',err);
+            callback_failure('Unexpected server error');
+          }
         }
         else {
-          callback(results[0]);
+          callback_success(results[0]);
         }
       });
     }

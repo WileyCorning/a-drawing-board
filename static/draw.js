@@ -6,7 +6,7 @@ var canvas = document.getElementById("input-canvas");
 var W=canvas.width;
 var H=canvas.height;
 var ctx = canvas.getContext('2d');
-ctx.fillStyle="#fff";
+ctx.fillStyle='#'+Math.floor(Math.random()*16777215).toString(16);
 ctx.fillRect(0,0,W,H);
 var imdata = ctx.getImageData(0,0,W,H);
 var selected_color = [0,0,0,255];

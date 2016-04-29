@@ -62,10 +62,12 @@ mixin header
               
       else
         div#login
-          input#login-username(type='text', placeholder='username', pattern='[A-Za-z0-9]+')
-          input#login-password(type='password', placeholder='password')
-          button#login-submit Login
-          button#login-submit-create Sign up
+          div#login-form
+            input#login-username(type='text', placeholder='username', pattern='[A-Za-z0-9]+')
+            input#login-password(type='password', placeholder='password')
+            button#login-submit Login
+            button#login-submit-create Sign up
+          div#login-failure
           script.
             $(document).ready(function(){
               $('#login-submit').click(function(){
@@ -74,15 +76,26 @@ mixin header
                   password: $('#login-password').val()
                 });
               });
-              socket.on('jwt', function(msg) {
+              socket.on('login:success', function(msg) {
                 console.log(msg);
                 document.cookie='token='+msg['token']+';';
                 location.reload(true);
               });
+              socket.on('login:failure',function(msg){
+                $('#login-failure').html(msg['feedback']);
+              })
               $('#login-submit-create').click(function(){
                 socket.emit('create_user', {
                   username: $('#login-username').val(),
                   password: $('#login-password').val()
                 });
               });
+              socket.on('create_user:success', function(msg) {
+                console.log(msg);
+                document.cookie='token='+msg['token']+';';
+                location.reload(true);
+              });
+              socket.on('create_user:failure',function(msg){
+                $('#login-failure').html(msg['feedback']);
+              })
             });
