@@ -41,7 +41,7 @@ style.
 mixin header
   nav#header
     .container
-      a.logo(href='/') Site Name
+      a.logo(href='/') A Drawing Board
       if user_id
         span#header-left
           a(href='/u/#{user_id}').username=username
@@ -71,6 +71,8 @@ mixin header
           script.
             $(document).ready(function(){
               $('#login-submit').click(function(){
+                // Delete current token if it exists
+                document.cookie = 'token=;expires=Thu, 01 Jan 1970 00:00:01 GMT;';
                 socket.emit('login', {
                   username: $('#login-username').val(),
                   password: $('#login-password').val()
@@ -85,6 +87,8 @@ mixin header
                 $('#login-failure').html(msg['feedback']);
               })
               $('#login-submit-create').click(function(){
+                // Delete current token if it exists
+                document.cookie = 'token=;expires=Thu, 01 Jan 1970 00:00:01 GMT;';
                 socket.emit('create_user', {
                   username: $('#login-username').val(),
                   password: $('#login-password').val()

@@ -19,7 +19,7 @@ var $ = require('jquery');
 var jwt = require('jsonwebtoken');
 
 var database_query_manager = require('./database_query_manager');
-var ajax_handlers = require('./ajax_handlers');
+var socket_api = require('./socket_api');
 var router = require('./router');
 
 // Maintain a single database connection through a local account
@@ -37,7 +37,7 @@ app.use(router(dbqm));
 io.on('connection', function(socket) {
   socket.room=socket.handshake.query.room;
   socket.join(socket.room);
-  var handlers = new ajax_handlers(io,socket,dbqm);
+  var handlers = new socket_api(io,socket,dbqm);
   Object.keys(handlers).forEach(function(event_type){
     socket.on(event_type,function(msg){console.log(event_type,msg);handlers[event_type](msg);});
   });
