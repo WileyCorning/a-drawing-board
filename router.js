@@ -60,13 +60,19 @@ module.exports = function(dbqm) {
     var pid = req.params['pid'];
     dbqm.get_post([pid],function(rows){
       var parent = rows[0]
-      res.render('post_and_replies.jade',{parent:rows[0]});
+      res.render('post_and_replies.jade',{parent:rows[0]},function(err,html){
+        if(err){console.log(err);res.send('500');}
+        else{res.send(html);}
+      });
     });
   });
 
   router.get('/u/:uid([0-9]+)',function(req,res){
     var uid = req.params['uid'];
-    res.render('user.jade',{user:{user_id: uid}});
+    res.render('user.jade',{user:{user_id: uid}},function(err,html){
+      if(err){console.log(err);res.send('500');}
+      else{res.send(html);}
+    });
   })
 
   return router;

@@ -8,7 +8,9 @@ var DEFAULT_PROC_NAMES = [
   'login',
   'get_user_access',
   'get_post',
-  'get_posts_matching'
+  'get_replies_to',
+  'get_posts_by',
+  'set_vote'
 ];
 
 var ESE_PREF_LEN = 'ER_SIGNAL_EXCEPTION: '.length

@@ -90,9 +90,11 @@ style.
     font-weight: 600;
     pointer-events: none;
   }
+  .vote-score{
+    display:none;
+  }
 
 mixin post_list(selector,allow_replies)
-  -selector=selector||{}
   .postList-container
     if(allow_replies)
       #input-open-container.post-container
@@ -108,33 +110,95 @@ mixin post_list(selector,allow_replies)
     span#postList
     script.
       $(document).ready(function(){
+        var score_max = 10;
+        var score_min = -5;
+        
+        var get_score_color = function(vote_score){
+          if(vote_score < 0){
+            var rel = 1-vote_score/score_min;
+            return 'rgba(63,63,127,'+(1-rel)+')';
+            }
+          else if(vote_score > 0){
+            var rel = 1-vote_score/score_max;
+            return 'rgba(255,127,0,'+(1-rel)+')';
+            }
+          else {
+            return 'rgba(255,255,255,0)';
+          }
+        }
+        
+        var recolor_all = function(){
+          $('#postList .post-container').each(function(){
+            $(this).css({'background-color':get_score_color(parseInt($(this).find('.vote-score').html()))});
+          });
+        }
+        
+        var check_score_bounds = function(vote_score) {
+          if(vote_score > score_max){
+            score_max = vote_score;
+            recolor_all();
+          }
+          else if(vote_score < score_min){
+            score_min = vote_score;
+            recolor_all();
+          }
+        }
+        
         var make_post = function(msg) {
           var post_container = $('<div class=post-container>');
-          var post = $('<a class=post id=m'+msg['post_id']+' href=/'+msg['post_id']+'>');
+          var post = $('<a class=post id=p'+msg['post_id']+' href=/'+msg['post_id']+'>');
           var image = $('<img class=content src=/i/'+msg['content']+'.png>')
-          var reply_count = $('<div class=reply-count>').html(msg['num_replies']);
-          post_container.append(reply_count);
+          var num_replies = msg['num_replies'];
+          var vote_score = msg['vote_score'];
+          var num_replies_view = $('<div class=reply-count>').html(num_replies);
+          var vote_score_view = $('<div class=vote-score>').html(vote_score);
+          
+          post_container.append(num_replies_view);
+          post_container.append(vote_score_view);
           post.append(image);
           post_container.append(post);
           post_container.css({
             'opacity':'0',
-            'background-color':'rgba(255,127,0,'+Math.random()+')'
+            'background-color':get_score_color(msg['vote_score'])
           });
           image.one('load',function(){post_container.css('opacity',1)}).each(function(){if(this.complete) $(this).load();});
+          
+          if(msg['requester_vote']==1){
+            post.css('box-shadow','0px 0px 5px 5px rgba(255,127,0,0.75)');
+          }
+          else if(msg['requester_vote']==-1){
+            post.css('box-shadow','0px 0px 5px 5px rgba(63,63,137,0.75)');
+          }
+          
+          socket.on('vote_score['+msg['post_id']+']:update',function(msg){
+            vote_score = msg['vote_score'];
+            vote_score_view.html(vote_score);
+            check_score_bounds(vote_score);
+            post_container.css({'background-color':get_score_color(vote_score)});
+          });
+          socket.on('num_replies['+msg['post_id']+']:delta',function(msg){
+            num_replies += msg['num_replies'];
+            num_replies_view.html(num_replies);
+          });
           return post_container;
         }
         
-        socket.emit('get_posts_matching',!{JSON.stringify(selector)});
-        
-        // TODO check selector
+        // TODO verify selector (in case of multiple lists on same page)
         socket.on('message', function(msg){
+          //check_score_bounds(msg['vote_score']);
           $('#postList').prepend(make_post(msg));
         });
         
-        socket.on('messages',function(msg){
-          WWW = msg;
+        socket.on('get_posts_matching:success',function(msg){
           for(var i = 0; i < msg.length; i++){
+            score_max = Math.max(score_max,msg[i]['vote_score'])
+            score_min = Math.min(score_min,msg[i]['vote_score'])
+          }
+          for(var i = 0; i < msg.length; i++){
+            console.log('a');
             $('#postList').prepend(make_post(msg[i]));
           }
         });
+        socket.emit('get_posts_matching',!{JSON.stringify(selector)});
+        
       });

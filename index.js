@@ -5,6 +5,9 @@ var app = express();
 var cookieParser = require('cookie-parser');
 app.set('view engine', 'jade');
 app.use('/i',express.static('user_images'));
+app.get('/i/*',function(req,res){
+  res.status(404).redirect('/s/404.png')
+})
 app.use('/s',express.static('static'));
 app.use(cookieParser());
 

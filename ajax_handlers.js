@@ -105,6 +105,10 @@ module.exports = function(io,socket,dbqm) {
             if(err)console.log(err);
             socket.emit('create_post:success',{});
             io.sockets.in(socket.room).emit('message',rows[0]);
+            if(msg['parent_id']){
+              //TODO better selector
+              io.emit('num_replies['+msg['parent_id']+']:delta',{'num_replies':1});
+            }
           });
         },
         function(err){
@@ -117,9 +121,36 @@ module.exports = function(io,socket,dbqm) {
     }
   };
 
+  this.set_vote = function(msg) {
+    try {
+      dbqm.set_vote(
+        [private_state['user_id'],msg['post_id'],msg['vote_value']],
+        function(rows){
+          socket.emit('set_vote:success',{});
+          //TODO better selector
+          io.emit('vote_score['+msg['post_id']+']:update',{'vote_score':rows[0]['vote_score']});
+        },
+        function(err){
+          socket.emit('set_vote:failure',{'feedback':err});
+        }
+      );
+    }
+    catch(err) {
+      console.log(err);
+    }
+  }
+
   this.get_posts_matching = function(msg) {
     try {
-      dbqm.get_posts_matching([msg.parent_id,msg.author_id],function(rows) {socket.emit('messages',rows);},function(err){console.log(err)});
+      if(msg.parent_id){
+        dbqm.get_replies_to([msg.parent_id==-1?undefined:msg.parent_id,private_state['user_id']],function(rows) {socket.emit('get_posts_matching:success',rows);},function(err){console.log(err)});
+      }
+      else if(msg.hasOwnProperty('author_id')){
+        dbqm.get_posts_by([msg.author_id,private_state['user_id']],function(rows) {socket.emit('get_posts_matching:success',rows);},function(err){console.log(err)});
+      }
+      else {
+        throw("Can't handle selector "+JSON.stringify(msg));
+      }
     }
     catch(err) {
       console.log(err);
