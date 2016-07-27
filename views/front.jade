@@ -3,17 +3,24 @@ html
   head
     title  A Drawing Board
     include includes/common.jade
-    include includes/client_socket.jade
-    +client_socket
+    include includes/client-socket.jade
+    include includes/react-setup.jade
+    script(type='text/babel',src='s/components/PostList.jsx')
   body
     include includes/header.jade
-    +header
-    if user_id
-      include includes/input_overlay.jade
-      +input_overlay
+      
+    if user
+      include includes/input-overlay.jade
+      include includes/favorites-panel.jade
     #page-content.container
-      include includes/post_list.jade
-      if user_id
-        +post_list({'parent_id':-1},true)
-      else
-        +post_list({'parent_id':-1})
+      span#front-posts-container
+        script(type='text/babel').
+          var target = {page:'/'};
+          ReactDOM.render(
+            <window.components.PostList
+              up={target}
+              #{user && 'user_id={\''+user.user_id+'\'}'}
+              allow_replies={#{!!user}}
+            />,
+            document.getElementById('front-posts-container')
+          ); 

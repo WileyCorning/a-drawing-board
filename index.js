@@ -1,5 +1,3 @@
-
-
 var express = require('express');
 var app = express();
 var cookieParser = require('cookie-parser');
@@ -13,37 +11,27 @@ app.use(cookieParser());
 
 var http = require('http').Server(app);
 var io = require('socket.io')(http);
-var mysql = require('mysql');
-var fs = require('fs');
-var $ = require('jquery');
-var jwt = require('jsonwebtoken');
 
-var database_query_manager = require('./database_query_manager');
-var socket_api = require('./socket_api');
+var MongoClient = require('mongodb').MongoClient;
+var assert = require('assert');
+
+var SocketHandler = require('./socket-handler.js')
 var router = require('./router');
 
-// Maintain a single database connection through a local account
-var dbc = mysql.createConnection({
-  host: 'localhost',
-  user: 'robot',
-  database: 'garbage'
-});
+/* INIT */
+function startServer(){
+  return MongoClient.connect("mongodb://localhost:27017/adb").then(function(db){
+    app.use(router(db));
 
-dbc.connect(function(err){if(err){console.log(err);}else{console.log('Connected to db');}});
-
-var dbqm = new database_query_manager(dbc);
-app.use(router(dbqm));
-
-io.on('connection', function(socket) {
-  socket.room=socket.handshake.query.room;
-  socket.join(socket.room);
-  var handlers = new socket_api(io,socket,dbqm);
-  Object.keys(handlers).forEach(function(event_type){
-    socket.on(event_type,function(msg){console.log(event_type,msg);handlers[event_type](msg);});
+    io.on('connection',function(socket){
+      console.log("new connection!");
+      new SocketHandler(db,io,socket);
+    });
+    var port_number = 8080;
+    http.listen(port_number, function(){
+      console.log('Began listening on port '+port_number);
+    });
   });
-});
+}
 
-var port_number = 8080
-http.listen(port_number, function(){
-  console.log('Began listening on port '+port_number);
-});
+startServer();

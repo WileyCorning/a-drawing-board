@@ -6,8 +6,65 @@
 var express = require('express');
 var jwt = require('jsonwebtoken');
 
+var util = require('./util');
+var auth = require('./auth');
+
 var JWT_KEY = 'unsecure key';
 
+module.exports = function(db){
+  var router = express.Router();
+
+  // Set user ID and access level according to token, if one is supplied
+  router.use(function(req, res, next) {
+    if(req.cookies && 'token' in req.cookies){
+      var token = req.cookies.token;
+      auth.authenticateFromToken(token).then(
+        function(data){
+          res.locals.user = data;
+          next();
+        },
+        function(err){
+          console.log(err);
+          next();
+        }
+      );
+    }
+    else {
+      next();
+    }
+  });
+
+
+  router.get('/',function(req,res){
+    res.render('front.jade');//,{user:{user_id:3,username:"Not real"}});
+  });
+
+  router.get('/p/:post_id([a-zA-Z0-9\-_]+)',function(req,res){
+    util.getPostDetails(db,req.params.post_id).then(
+      function(post_info){
+        console.log(post_info);
+        res.render('post-display.jade',{main_post:post_info});
+      },
+      function(err){
+        console.log(err);
+      }
+    );
+  });
+
+  router.get('/u/:user_id([a-zA-Z0-9\-_]+)',function(req,res){
+    util.getUserDetails(db,req.params.user_id).then(
+      function(user_info){
+        console.log(user_info);
+        res.render('user-display.jade',{main_user:user_info});
+      },
+      function(err){
+        console.log(err);
+      }
+    );
+  });
+  return router;
+}
+/*
 module.exports = function(dbqm) {
   var router = express.Router();
 
@@ -56,7 +113,7 @@ module.exports = function(dbqm) {
     res.render('front.jade');
   });
 
-  router.get('/:pid([0-9]+)', function(req, res){
+  router.get('/p/:pid([0-9]+)', function(req, res){
     var pid = req.params['pid'];
     dbqm.get_post([pid],function(rows){
       var parent = rows[0]
@@ -77,3 +134,4 @@ module.exports = function(dbqm) {
 
   return router;
 };
+*/
