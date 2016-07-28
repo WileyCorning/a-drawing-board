@@ -1,0 +1,39 @@
+
+#input-overlay
+  #input-overlay-background
+  #input-container
+    iframe#input-frame(width=800,height=600,src="/s/drawing_panel.html")
+    div
+      button#input-submit Post
+      button#input-cancel Cancel
+    script.
+    script.
+      $(document).ready(function(){
+        window.CurrentPostParent = window.CurrentPostParent || {page:'/'};
+        var hideOverlay = function(){
+          $('#input-overlay').css('display','none');
+        }
+        
+        $(document).keydown(function(event){
+          if(event.which===27){
+            hideOverlay();
+          }
+        });
+        $('#input-overlay-background').click(function(event){
+          hideOverlay();
+        });
+        $('#input-cancel').click(function(event){
+          hideOverlay();
+        });
+        
+        $('#input-submit').click(function(event){
+          var payload = $('iframe').contents().find('#input-canvas')[0].toDataURL('image/png');
+          socket.emit('createPost', {
+            user_id: '#{user.user_id}',
+            content:payload,
+            parent: window.CurrentPostParent
+          });
+          $('iframe')[0].src+='';
+          hideOverlay();
+        });
+      });

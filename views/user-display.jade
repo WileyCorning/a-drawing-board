@@ -1,0 +1,22 @@
+doctype html
+html
+  head
+    title Viewing #{main_user.username}
+    include includes/common.jade
+    include includes/client-socket.jade
+    include includes/react-setup.jade
+    script(type='text/babel',src='/s/components/PostList.jsx')
+    script(type='text/babel',src='/s/components/ActionTable.jsx')
+  body
+    include includes/header.jade
+    #page-content.container
+      include includes/user-detail.jade
+      +user_detail(main_user)
+      #user-actions-container
+        script(type='text/babel').
+          ReactDOM.render(
+            <window.components.ActionTable
+              user_id='#{main_user.user_id}'
+            />,
+            document.getElementById('user-actions-container')
+          );

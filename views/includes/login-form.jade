@@ -1,0 +1,46 @@
+div#login
+  div#login-form
+    input#login-username(type='text', placeholder='username', pattern='[A-Za-z0-9]+')
+    input#login-password(type='password', placeholder='password')
+    button#login-submit Login
+    button#register-submit Register
+  div#login-failure
+  script.
+    $(document).ready(function(){
+      var doLogin = function(e){
+        // Delete current token if it exists
+        document.cookie = 'token=;expires=Thu, 01 Jan 1970 00:00:01 GMT;';
+        socket.expectReply('login',{
+          username: $('#login-username').val(),
+          password: $('#login-password').val()
+        }).then(
+          function(msg){
+            document.cookie='token='+msg.token+';';
+            location.reload(true);
+          },
+          function(err){
+            twarn(err);
+          }
+        );
+      };
+      
+      var doRegister = function(e){
+        var username = $('#login-username').val();
+        var password = $('#login-password').val();
+        socket.expectReply('createUser',{
+          username: username,
+          password: password
+        })
+        .then(
+          function(msg){
+            doLogin();
+          },
+          function(err){
+            twarn(err);
+          }
+        );
+      };
+      
+      $('#login-submit').click(doLogin);
+      $('#register-submit').click(doRegister);
+    });

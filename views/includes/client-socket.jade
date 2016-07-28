@@ -1,0 +1,30 @@
+script(src="/socket.io/socket.io.js")
+script.
+  socket=io();
+  socket.expectReply = function(key,msg){
+    return new Promise(function(resolve,reject){
+      socket.emit(key,msg);
+      socket.on(key+':success',function(data){
+        resolve(data);
+      });
+      socket.on(key+':failure',function(data){
+        reject(data);
+      });
+    });
+  }
+  twarn = function(dblob){
+    alert(JSON.stringify(dblob));
+  }
+  
+  // Authenticate
+  var cookie_parsed = document.cookie.split(';').map(function(s){return s.trim().split('=');}).reduce(function(a,b){a[b[0]]=b[1];return a;},{});
+  if('token' in cookie_parsed){
+    socket.expectReply('authenticateFromToken',{'token': cookie_parsed.token}).then(
+      function(data){
+        console.log(data.user_id + ':::' + data.username);
+        ClientInfo = {user_id: data.user_id+'', username:data.username+''}
+      },
+      function(err){
+        alert(err);
+      });
+  }

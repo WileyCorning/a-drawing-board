@@ -1,0 +1,4 @@
+
+mixin user_detail(user_info)
+  .userDetail(id='u#{user_info.user_id}-detail').
+    User #[span(class='emph') #{user_info.username}] was created at #{new Date(user_info.timestamp).toUTCString()}.

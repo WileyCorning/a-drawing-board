@@ -1,21 +1,23 @@
 doctype html
 html
   head
-    title  A Drawing Board
+    title Viewing #{main_post.post_id}
     include includes/common.jade
     include includes/client-socket.jade
     include includes/react-setup.jade
     script(type='text/babel',src='/s/components/PostList.jsx')
   body
     include includes/header.jade
-      
     if user
       include includes/input-overlay.jade
       include includes/favorites-panel.jade
+      
     #page-content.container
-      #post-replies-container
+      include includes/post-detail.jade
+      +post_detail(main_post)
+      div#post-replies-container
         script(type='text/babel').
-          var target = {page:'/'};
+          var target = {post_id: '#{main_post.post_id}'};
           ReactDOM.render(
             <window.components.PostList
               up={target}
@@ -23,4 +25,4 @@ html
               allow_replies={#{!!user}}
             />,
             document.getElementById('post-replies-container')
-          ); 
+          );

@@ -1,0 +1,17 @@
+doctype html
+html
+  head
+    title  A Drawing Board
+    include includes/common.jade
+    include includes/client-socket.jade=
+  body
+    include includes/header.jade
+    if user_id
+      include includes/input_overlay.jade
+      +input_overlay
+    #page-content.container
+      include includes/post_list_react.jade
+      if user_id
+        +post_list({'parent_id':-1},true)
+      else
+        +post_list({'parent_id':-1})

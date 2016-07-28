@@ -1,0 +1,325 @@
+/* Common */
+html {
+  height: 100%;
+}
+body {
+  height: 100%;
+  font-family: 'Open Sans',sans-serif;
+  margin: 0;
+  padding:0;
+  background-image: url("/s/bgstripe.jpg");
+}
+#message-container { display:table; text-align: center;  width: 100%;}
+
+#page-content{
+  margin-top:20px;
+  height: 100%;
+}
+
+.container{
+  max-width:1280px;
+  margin: auto;
+  padding: 0px 20px 0px 20px;
+}
+
+
+/* From header */
+#header {
+  margin: 0;
+  padding: 10px 0px 10px 0;
+  border-bottom: 1px solid #aaa;
+  background-color: #eee;
+  width: 100%;
+  z-index: 100;
+  text-align: center;
+}
+#header-left{
+  float:left;
+}
+#header-below{
+  padding-top: 10px;
+}
+#header-right{
+  float:right;
+}
+.username {font-size: 120%; font-weight: 600; float:left;}
+.logo {
+  display: inline-block;
+  font-size: 64px;
+  line-height: 0px;
+  padding-top: 24px;
+  padding-bottom: 0px;
+  font-family: 'Tangerine',cursive;
+  font-weight: 700;
+  text-decoration: none;
+  color: black;
+}
+.logo:hover{
+  text-shadow: 0px 0px 8px black;
+}
+.header-buttons {
+  float: right;
+}
+#login input {
+  width: 160px;
+}
+
+
+/* From post list */
+#input-open-container {
+}
+#input-open-button {
+  box-shadow: 0px 0px 0px 10px rgba(127,127,127,0.5);
+  background-color: transparent;
+  text-align: center;
+  vertical-align: middle;
+  font-size: 6em;
+  color: rgba(127,127,127,0.5);
+  margin: 15px;
+  display: block;
+  overflow: hidden;
+  border-radius: 80px;
+  transition: box-shadow 0.2s ease, color 0.2s ease;
+  position:absolute;
+  top:0;
+  bottom: 0;
+  left:0;
+  right:0;
+  outline: 0;
+}
+#input-open-button:hover {
+  transition: box-shadow 0.2s ease, color 0.2s ease;
+  box-shadow: 0px 0px 0px 2px rgba(0,0,255,1.0);
+  color: rgba(0,0,255,1.0);
+}
+#input-open-button img {
+  width: 160px;
+  height: 160px;
+  margin-left: -15px;
+  margin-top: -15px;
+}
+.post-container {
+  width: 160px;
+  height: 160px;
+  display: inline-block;
+  position: relative;
+  overflow: hidden;
+  transition: opacity 1s ease;
+  margin-bottom: -5px;
+}
+.post {
+  background-color: transparent;
+  margin: 14px;
+  display: block;
+  box-shadow: inset 0px 0px 4px rgba(0,0,0,0.5);
+  overflow: hidden;
+  border-radius: 10px;
+  vertical-align:middle;
+  transition: box-shadow 0.5s 1s ease, margin 0.5s 1.5s ease, border-radius 0.5s 1.5s ease;
+  position:absolute;
+  top:0;
+  bottom: 0;
+  left:0;
+  right:0;
+  text-decoration: none;
+  text-align: center;
+  vertical-align: middle;
+  color: black;
+  outline: 0;
+}
+.post img {
+  width: 160px;
+  height: 160px;
+  margin-top: -14px;
+  margin-left: -14px;
+  transition: margin 0.5s 1.5s ease;
+}
+.post-container:hover .post img {
+  transition: margin 0.1s linear;
+  margin: 0;
+}
+.post-container:hover .post {
+  transition: box-shadow 0.1s linear, margin 0.1s linear, border-radius 0.1s linear;
+  box-shadow: none;
+  margin: 0;
+  border-radius: 0;
+}
+.reply-count{
+  display: inline-block;
+  position: absolute;
+  bottom: 0;
+  right: 0;
+  z-index: 5;
+  padding: 20px;
+  opacity: 0.5;
+  color: #fff;
+  text-shadow: -1px 0px 0px #000, 1px 0px 0px #000, 0px -1px 0px #000, 0px 1px 0px #000;
+  font-weight: 600;
+  pointer-events: none;
+  transition: opacity 0.5s 1.5s ease;
+}
+.post-container:hover .reply-count {
+  transition: opacity 0.1s linear;
+  opacity: 0;
+}
+.unfavorite-button {
+  border-radius: 24px;
+  text-align: center;
+  vertical-align: middle;
+  width: 24px;
+  height: 24px;
+  box-shadow: 0px 0px 0px 4px rgba(127,127,127,0.5);
+  transition: box-shadow 0.2s ease, color 0.2s ease;
+  display: inline-block;
+  position: absolute;
+  top: 0;
+  right: 0;
+  z-index: 5;
+  color: rgba(127,127,127,0.5);
+  margin-top:8px;
+  margin-right:8px;
+}
+.unfavorite-button:hover {
+  box-shadow: 0px 0px 0px 2px rgba(255,0,0,1.0);
+  transition: box-shadow 0.2s ease, color 0.2s ease;
+  color: rgba(255,0,0,1.0);
+}
+#favorites-panel-container {
+background-image: url("/s/bgstripe.jpg");
+  z-index:10;
+  position: fixed;
+  height: 100%;
+  overflow-y: scroll;
+  overflow-x: hidden;
+  border-left: 10px solid rgba(127,127,127,0.5);
+  right:0;
+}
+#favorites-panel{
+  text-align: center;
+  color: rgba(127,127,127,0.5);
+  font-weight: 600;
+  padding-left: 10px;
+  width:160px;
+  height: 100%;
+}
+.tile-info-icons{
+  position: absolute;
+  z-index:5;
+  color: rgba(127,127,127,0.5);
+  left: 20px;
+  top: 20px;
+  opacity: 1;
+  transition: opacity 0.5s 1.5s ease;
+}
+.post-container:hover div {
+  opacity: 0;
+  transition: opacity 0.1s linear;
+}
+#post-replies-container {
+  height: 100%;
+}
+.postList {
+  height: 100%;
+}
+
+
+/* From input overlay */
+#input-overlay {
+  display: none;
+  position: fixed;
+  top: 0;
+  bottom: 0;
+  width: 100%;
+  height: 100%;
+  text-align: center;
+  z-index: 10;
+}
+#input-overlay-background {
+  width: 100%;
+  height: 100%;
+  position: fixed;
+  background-color: rgba(127,127,127,0.5);
+}
+#input-container {
+  vertical-align: middle;
+  display: inline-block;
+  padding: 20px;
+  border-radius: 20px;
+  background-color: white;
+  position: absolute;
+  left: 0;
+  right: 0;
+  margin-left: auto;
+  margin-right: auto;
+  top: 0;
+  bottom: 0;
+  margin-top: auto;
+  margin-bottom: auto;
+  height: 700px;
+  width:840px;
+}
+
+/* From post detail */
+.postDetail {
+  background-color: #ddd;
+  margin: 20px;
+  padding: 20px;
+  text-align:center;
+  padding: 10px;
+}
+.postDetail-left{
+  display: inline-block;
+  float: left;
+  height: 100%;
+}
+.postDetail-content {
+  display: inline-block;
+}
+.postDetail-right{
+  display: inline-block;
+  float: right;
+  height: 100%;
+}
+.postDetail-votes{
+  vertical-align: bottom;
+}
+.pageTile{
+  margin: 10px;
+  width: 120px;
+  height: 120px;
+  display: inline-block;
+  position: relative;
+  overflow: hidden;
+  border-radius: 20px;
+  border: 10px solid rgba(127,127,127,0.5);
+}
+.pageTile a {
+  display: block;
+  text-align: center;
+  vertical-align: middle;
+  width: 100%;
+  height: 100%;
+  text-decoration: none;
+  color: rgba(127,127,127,0.5);
+  font-size: 8em;
+}
+
+/* From user detail */
+.userDetail {
+  background-color: #ddd;
+  margin: 20px;
+  padding: 20px;
+  text-align:center;
+  padding: 10px;
+}
+.emph {
+  font-weight: 600;
+}
+.attach-type-big {
+  width: 160px;
+  height: 160px;
+  font-size: 5em;
+  color: rgba(127,127,127,0.5);
+  text-align: center;
+  vertical-align: middle;
+}

@@ -1,0 +1,22 @@
+
+mixin post_detail(post_info)
+  .postDetail(id='p#{post_info.post_id}-detail')
+    .postDetail-left
+      div Posted on
+      if post_info.parent.post_id
+        .post-container
+          a.post(id='p#{post_info.parent.post_id}',href='/p/#{post_info.parent.post_id}')
+            img.content(src='/i/#{post_info.parent.post_id}.png')
+      else
+        .pageTile
+          a(href='/' class='fa fa-home')
+    img.postDetail-content(src='/i/#{post_info.post_id}.png')
+    script.
+      $('p#{post_info.post_id}-detail').on('dragstart',function(event){
+        event.originalEvent.dataTransfer.setData('text/plain',JSON.stringify({type:'fromContent',post_id:'#{post_info.post_id}'}));
+      });
+
+    .postDetail-right
+      div By 
+        a(href='/u/#{post_info.author.user_id}')=post_info.author.username
+      div at #{new Date(post_info.timestamp).toUTCString()}
