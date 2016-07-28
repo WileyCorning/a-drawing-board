@@ -10,9 +10,9 @@ mixin post_detail(post_info)
       else
         .pageTile
           a(href='/' class='fa fa-home')
-    img.postDetail-content(src='/i/#{post_info.post_id}.png')
+    img.postDetail-content(id='p#{post_info.post_id}-detail-img' src='/i/#{post_info.post_id}.png' draggable='true')
     script.
-      $('p#{post_info.post_id}-detail').on('dragstart',function(event){
+      $('#p#{post_info.post_id}-detail-img').on('dragstart',function(event){
         event.originalEvent.dataTransfer.setData('text/plain',JSON.stringify({type:'fromContent',post_id:'#{post_info.post_id}'}));
       });
 
