@@ -27,7 +27,7 @@ function startServer(){
       console.log("new connection!");
       new SocketHandler(db,io,socket);
     });
-    var port_number = 8080;
+    var port_number = 80;
     http.listen(port_number, function(){
       console.log('Began listening on port '+port_number);
     });
